@@ -1,5 +1,5 @@
 from langchain_community.retrievers import BM25Retriever
-from langchain_core.tools import Tool
+from langchain_core.tools import Tool, tool
 from langchain_openai import ChatOpenAI
 
 import os
@@ -48,6 +48,8 @@ model = ChatOpenAI(
     api_key=os.getenv('API_KEY')
 )
 
+
+@tool
 def draft_conversation(data: str) -> str:
   """Returns draft for starting conversation with a requested guest"""
   try:
@@ -62,14 +64,6 @@ def draft_conversation(data: str) -> str:
         },
       ]
     response = model.invoke(messages)
-    return response
+    return response.content
   except Exception as e:
     return f'Error: {e}'
-
-draft_conversation_tool = Tool(
-    name="draft_conversation_with_guest",
-    description="""Return draft for starting conversation with a requested guest
-                 Input: data (str) with 'name' and 'description' keys"
-                 Output: draft (str) for conversation""",
-    func=draft_conversation,
-)
